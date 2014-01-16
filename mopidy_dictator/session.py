@@ -2,13 +2,14 @@ from __future__ import unicode_literals
 
 import logging
 
-from .dispatcher import dispatcher, protocol
+from mopidy.mpd import protocol
+from . import dispatcher
 from mopidy.utils import formatting, network
 
 logger = logging.getLogger(__name__)
 
 
-class MpdSession(network.LineProtocol):
+class DictatorSession(network.LineProtocol):
     """
     The MPD client session. Keeps track of a single client session. Any
     requests from the client is passed on to the MPD request dispatcher.
@@ -19,8 +20,8 @@ class MpdSession(network.LineProtocol):
     delimiter = r'\r?\n'
 
     def __init__(self, connection, config=None, core=None):
-        super(MpdSession, self).__init__(connection)
-        self.dispatcher = dispatcher.MpdDispatcher(
+        super(DictatorSession, self).__init__(connection)
+        self.dispatcher = dispatcher.DictatorDispatcher(
             session=self, config=config, core=core)
 
     def on_start(self):
@@ -45,7 +46,7 @@ class MpdSession(network.LineProtocol):
 
     def decode(self, line):
         try:
-            return super(MpdSession, self).decode(line.decode('string_escape'))
+            return super(DictatorSession, self).decode(line.decode('string_escape'))
         except ValueError:
             logger.warning(
                 'Stopping actor due to unescaping error, data '

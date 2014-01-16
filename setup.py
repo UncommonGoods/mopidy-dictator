@@ -24,15 +24,11 @@ setup(
     include_package_data=True,
     install_requires=[
         'setuptools',
-        'Mopidy >= 0.16a0',
+        # easy_install will not get you an up-to-date version,
+        # so just install it from the UncommonGoods fork.
+        # 'Mopidy >= 0.18.0a1',
         'Pykka >= 1.1',
-        # 'pylast >= 0.5.7',
     ],
-    # test_suite='nose.collector',
-    # tests_require=[
-    #     'nose',
-    #     'mock >= 1.0',
-    # ],
     entry_points={
         'mopidy.ext': [
             'dictator = mopidy_dictator:Extension',

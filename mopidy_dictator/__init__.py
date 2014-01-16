@@ -20,7 +20,6 @@ class Extension(ext.Extension):
 
     def get_config_schema(self):
         schema = super(Extension, self).get_config_schema()
-        # schema['username'] = config.String(optional=True)
         schema['hostname'] = config.Hostname()
         schema['port'] = config.Port()
         schema['password'] = config.Secret(optional=True)
@@ -33,8 +32,8 @@ class Extension(ext.Extension):
         pass
 
     # def setup(self, registry):
-    #     from .actor import MpdFrontend
-    #     registry.add('frontend', MpdFrontend)
+    #     from .actor import DictatorFrontend
+    #     registry.add('frontend', DictatorFrontend)
 
     def get_frontend_classes(self):
         from .actor import DictatorFrontend
