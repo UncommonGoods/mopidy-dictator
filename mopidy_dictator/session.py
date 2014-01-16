@@ -26,7 +26,7 @@ class DictatorSession(network.LineProtocol):
 
     def on_start(self):
         logger.info('New Dictator connection from [%s]:%s', self.host, self.port)
-        self.send_lines(['OK Dictator %s' % protocol.VERSION])
+        self.send_lines(['OK MPD %s' % protocol.VERSION])
 
     def on_line_received(self, line):
         logger.debug('Request from [%s]:%s: %s', self.host, self.port, line)

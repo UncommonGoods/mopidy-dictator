@@ -9,6 +9,20 @@ from mopidy.mpd import exceptions, protocol
 
 logger = logging.getLogger(__name__)
 
+def _hacky_password_func(context, password):
+    """
+    *musicpd.org, connection section:*
+
+        ``password {PASSWORD}``
+
+        This is used for authentication with the server. ``PASSWORD`` is
+        simply the plaintext password.
+    """
+    if password == context.config['dictator']['password']:
+        context.dispatcher.authenticated = True
+    else:
+        raise MpdPasswordError('incorrect password', command='password')
+
 protocol.load_protocol_modules()
 
 
@@ -168,6 +182,10 @@ class DictatorDispatcher(object):
         return handler(self.context, **kwargs)
 
     def _find_handler(self, request):
+        # special case
+        matches = re.match(r'password\ "(?P<password>[^"]+)"$', request)
+        if matches is not None:
+            return (_hacky_password_func, matches.groupdict())
         for pattern in protocol.request_handlers:
             matches = re.match(pattern, request)
             if matches is not None:
