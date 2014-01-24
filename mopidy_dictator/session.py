@@ -31,6 +31,11 @@ class DictatorSession(network.LineProtocol):
     def on_line_received(self, line):
         logger.debug('Request from [%s]:%s: %s', self.host, self.port, line)
 
+        # custom rules. todo: put in config
+        if 'enableoutput "0"' in line:
+            logger.info("mute request denied")
+            return
+
         response = self.dispatcher.handle_request(line)
         if not response:
             return

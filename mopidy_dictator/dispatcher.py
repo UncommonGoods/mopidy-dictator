@@ -218,13 +218,13 @@ class DictatorContext(object):
     give the command handlers access to important parts of Mopidy.
     """
 
-    #: The current :class:`DictatorDispatcher`.
+    #: The current :class:`MpdDispatcher`.
     dispatcher = None
 
     #: The current :class:`mopidy.mpd.MpdSession`.
     session = None
 
-    #: The dictator password
+    #: The MPD password
     password = None
 
     #: The Mopidy core API. An instance of :class:`mopidy.core.Core`.
@@ -293,3 +293,19 @@ class DictatorContext(object):
         if uri not in self._playlist_name_from_uri:
             self.refresh_playlists_mapping()
         return self._playlist_name_from_uri[uri]
+
+    # TODO: consider making context.browse(path) which uses this internally.
+    # advantage would be that all browse requests then go through the same code
+    # and we could prebuild/cache path->uri relationships instead of having to
+    # look them up all the time.
+    def directory_path_to_uri(self, path):
+        parts = re.findall(r'[^/]+', path)
+        uri = None
+        for part in parts:
+            for ref in self.core.library.browse(uri).get():
+                if ref.type == ref.DIRECTORY and ref.name == part:
+                    uri = ref.uri
+                    break
+            else:
+                raise exceptions.MpdNoExistError()
+        return uri
