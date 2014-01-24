@@ -9,20 +9,6 @@ from mopidy.mpd import exceptions, protocol
 
 logger = logging.getLogger(__name__)
 
-def _hacky_password_func(context, password):
-    """
-    *musicpd.org, connection section:*
-
-        ``password {PASSWORD}``
-
-        This is used for authentication with the server. ``PASSWORD`` is
-        simply the plaintext password.
-    """
-    if password == context.config['dictator']['password']:
-        context.dispatcher.authenticated = True
-    else:
-        raise MpdPasswordError('incorrect password', command='password')
-
 protocol.load_protocol_modules()
 
 
@@ -182,10 +168,6 @@ class DictatorDispatcher(object):
         return handler(self.context, **kwargs)
 
     def _find_handler(self, request):
-        # special case
-        matches = re.match(r'password\ "(?P<password>[^"]+)"$', request)
-        if matches is not None:
-            return (_hacky_password_func, matches.groupdict())
         for pattern in protocol.request_handlers:
             matches = re.match(pattern, request)
             if matches is not None:
@@ -242,8 +224,8 @@ class DictatorContext(object):
     #: The current :class:`mopidy.mpd.MpdSession`.
     session = None
 
-    #: The Mopidy configuration.
-    config = None
+    #: The dictator password
+    password = None
 
     #: The Mopidy core API. An instance of :class:`mopidy.core.Core`.
     core = None
@@ -259,7 +241,8 @@ class DictatorContext(object):
     def __init__(self, dispatcher, session=None, config=None, core=None):
         self.dispatcher = dispatcher
         self.session = session
-        self.config = config
+        if config is not None:
+            self.password = config['dictator']['password']
         self.core = core
         self.events = set()
         self.subscriptions = set()
