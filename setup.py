@@ -27,6 +27,7 @@ setup(
         # easy_install will not get you an up-to-date version,
         # so just install it from the UncommonGoods fork.
         # 'Mopidy >= 0.18.0a1',
+        # 'sqlite3 >= 2.5',
         'Pykka >= 1.1',
     ],
     entry_points={

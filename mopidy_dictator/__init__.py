@@ -26,6 +26,31 @@ class Extension(ext.Extension):
         schema['max_connections'] = config.Integer(minimum=1)
         schema['connection_timeout'] = config.Integer(minimum=1)
         schema['zeroconf'] = config.String(optional=True)
+
+        # what to do when a bad word is encountered. either log it,
+        # ignore the command, or both.
+        schema['bad_word_action'] = config.String(optional=True,
+                                                  choices=['log', 'deny', 'both'])
+        # list of bad words to search commands for in regex format(?)
+        schema['bad_words'] = config.List(optional=True)
+        # list of ip:name pairs, or just ip
+        schema['ip_list'] = config.List(optional=True)
+        schema['disable_mute'] = config.Boolean()
+        # where to log transgressions
+        schema['log_file'] = config.Path(optional=True)
+        # instead of using log_file, log transgressions in memory
+        schema['log_memory'] = config.Boolean()
+        # number of consecutive tracks a single IP can queue. 0 means no limit.
+        schema['queue_limit'] = config.Integer(optional=True, minimum=0, maximum=10)
+
+        # experimental... disable automatic playing from search.
+        # have to prevent "playid" commands immediately following "addid" commands.
+        # Not sure if this is robust or even worth it...
+        schema['disable_autoplay'] = config.Boolean()
+
+        # enable spotify integration
+        schema['spotify_support'] = config.Boolean()
+        schema['bad_word_case_insensitive'] = config.Boolean()
         return schema
 
     def validate_environment(self):
