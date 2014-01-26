@@ -189,5 +189,4 @@ class DictatorSession(network.LineProtocol):
             self.stop()
 
     def close(self):
-        self.conn.close()
         self.stop()
