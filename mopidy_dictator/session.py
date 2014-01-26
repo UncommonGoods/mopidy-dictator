@@ -64,11 +64,8 @@ class DictatorSession(network.LineProtocol):
         c = conn.cursor()
         res = c.execute('SELECT num FROM bad_songs WHERE name=? AND song=?', (name, song)).fetchone()
         if res is None:
-            logger.info('inserting new record')
             c.execute('INSERT INTO bad_songs (name, song, num) VALUES (?, ?, ?)', (name, song, 1))
         else:
-            logger.info(res)
-            logger.info('updating. count: %d', res[0])
             c.execute('UPDATE bad_songs SET num=? WHERE name=? AND song=?', (res[0]+1, name, song))
         conn.commit()
         conn.close()
@@ -111,8 +108,9 @@ class DictatorSession(network.LineProtocol):
     def get_ip_from_host(self, host):
         return host.split(':')[-1].replace(']', '')
 
+    # returns True if the queue is filled entirely by adds from the 'search' ip
     def full_queue(self, search):
-        if self.recent_adds.empty():
+        if not self.recent_adds.full():
             return False
         for ip in self.recent_adds.queue:
             if search != ip:
