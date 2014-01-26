@@ -1,23 +1,22 @@
-****************
 Mopidy-Dictator
-****************
+============
 
 Rule mopidy with an iron fist.
 
 
-Installation
-============
+<h3>Installation</h3>
+
 
 Dictator replaces the standard MPD module, so you should disable it:
 
-``
+<pre>
 [mpd]
 enabled = false
-``
+</pre>
 
 Dictator supports all the basic configurations used by standard MPD:
 
-``
+<pre>
 [dictator]
 enabled = false
 password = 
@@ -26,11 +25,11 @@ port = 6600
 max_connections = 20
 connection_timeout = 60
 zeroconf = Mopidy MPD server on $hostname
-``
+</pre>
 
 And some others.
 
-``
+<pre>
 # a list of bad words. supports python's regex syntax.
 bad_words = 
   fart(ing)?
@@ -62,4 +61,4 @@ disable_autoplay = false
 
 # set to true if you're using the mopidy-spotify plugin
 spotify_support = true
-``
+</pre>
