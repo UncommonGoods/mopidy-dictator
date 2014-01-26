@@ -41,7 +41,7 @@ class Extension(ext.Extension):
         # instead of using log_file, log transgressions in memory
         schema['log_memory'] = config.Boolean()
         # number of consecutive tracks a single IP can queue. 0 means no limit.
-        schema['queue_limit'] = config.Integer(optional=True, minimum=0, maximum=10)
+        schema['queue_limit'] = config.Integer(optional=True, minimum=0, maximum=20)
 
         # experimental... disable automatic playing from search.
         # have to prevent "playid" commands immediately following "addid" commands.
