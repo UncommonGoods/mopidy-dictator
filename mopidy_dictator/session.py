@@ -36,7 +36,7 @@ class DictatorSession(network.LineProtocol):
         conf = config['dictator']
         self.make_ip_list(conf)
         self.init_db(conf)
-        self.addid = re.compile(r'^add(?:id)? "(.*)"$', re.I)
+        self.addid = re.compile(r'add(?:id)? "(.*)"', re.I)
         if conf['queue_limit'] > 0:
             self.recent_adds = Queue(maxsize=conf['queue_limit'])
         if conf['spotify_support']:
@@ -136,19 +136,18 @@ class DictatorSession(network.LineProtocol):
             return "ACK [50@1] {enableoutput} System mute disabled"
 
         # bad word filter
-        if  re.match(r'add(?:id)? ', line) is not None:
+        match = self.addid.match(line)
+        if  match is not None:
             logger.info("%s requested a new track", ip_name)
+            filename = match.group(1)
             if len(config['bad_words']) > 0:
                 logger.info('filtering bad words')
-                match = self.addid.search(line)
-                if match is not None:
-                    filename = match.group(1)
-                    logger.info("filename: "+filename)
-                    # translate spotify track ids to track names
-                    if config['spotify_support'] and re.match(r'spotify:', filename) is not None:
-                        if filename in self.translator.track_cache:
-                            filename = self.translator.track_cache[filename].name
-                            logger.info("spotify filename: "+filename)
+                logger.info("filename: "+filename)
+                # translate spotify track ids to track names
+                if config['spotify_support'] and re.match(r'spotify:', filename) is not None:
+                    if filename in self.translator.track_cache:
+                        filename = self.translator.track_cache[filename].name
+                        logger.info("spotify filename: "+filename)
                 for pattern in config['bad_words']:
                     try:
                         word_pattern = r'\b' + pattern + r'\b'
