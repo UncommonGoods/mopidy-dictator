@@ -45,7 +45,8 @@ class Extension(ext.Extension):
 
         # experimental... disable automatic playing from search.
         # have to prevent "playid" commands immediately following "addid" commands.
-        # Not sure if this is robust or even worth it...
+        # Not sure if this is robust or even worth it. Look into using
+        # 'command_list_(begin|end)'
         schema['disable_autoplay'] = config.Boolean()
 
         # enable spotify integration
