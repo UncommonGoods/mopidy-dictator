@@ -18,7 +18,7 @@ setup(
     author='Nathan Harper',
     author_email='nharper@uncommongoods.com',
     description='Plugin for ruling your Mopidy server with an iron fist.',
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
     packages=find_packages(exclude=['tests', 'tests.*']),
     zip_safe=False,
     include_package_data=True,
