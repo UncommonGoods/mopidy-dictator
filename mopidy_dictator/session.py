@@ -33,8 +33,8 @@ class DictatorSession(network.LineProtocol):
         super(DictatorSession, self).__init__(connection)
         self.dispatcher = dispatcher.DictatorDispatcher(
             session=self, config=config, core=core)
-        self.make_ip_list(config)
         conf = config['dictator']
+        self.make_ip_list(conf)
         self.init_db(conf)
         self.addid = re.compile(r'^add(?:id)? "(.*)"$', re.I)
         if conf['queue_limit'] > 0:
@@ -71,9 +71,8 @@ class DictatorSession(network.LineProtocol):
         conn.close()
         
     # TODO: make this support IP only syntax: ip(:name)?
-    def make_ip_list(self, config):
-        for ip, name in map(lambda x: x.split(':'), config['dictator']['ip_list']):
-            self.ip_list[ip] = name
+    def make_ip_list(self, conf):
+        self.ip_list = {ip:name for ip, name in map(lambda x: x.split(':'), conf['ip_list'])}
 
     def remove_from_queue(self):
         self.recent_adds.get(True, 1)
