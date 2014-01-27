@@ -167,11 +167,13 @@ class DictatorSession(network.LineProtocol):
                     except Exception as ex:
                         logger.info(ex)
 
-            if config['queue_limit'] and self.full_queue(ip):
-                # TODO: modify this behavior based on number of server connections
-                logger.info('track denied based on queue')
-                return "ACK [50@1] {addid} request limit exceeded"
-            self.add_to_queue(ip)
+            if config['queue_limit']:
+                if self.full_queue(ip):
+                    # TODO: modify this behavior based on number of server connections
+                    logger.info('track denied based on queue')
+                    return "ACK [50@1] {addid} request limit exceeded"
+                else:
+                    self.add_to_queue(ip)
         return True
 
     def on_idle(self, subsystem):
