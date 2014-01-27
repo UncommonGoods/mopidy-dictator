@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import logging
 import re
 import sqlite3
+import urllib
 
 from Queue import Queue
 from mopidy.mpd import protocol
@@ -62,6 +63,9 @@ class DictatorSession(network.LineProtocol):
     def log_play(self, song, name):
         conn = sqlite3.connect(self.log_file)
         c = conn.cursor()
+        m = re.search(r'^local:track:(.*)$', song)
+        if m is not None: # fix up local tracks
+            song = urllib.unquote(m.group(1))
         res = c.execute('SELECT num FROM bad_songs WHERE name=? AND song=?', (name, song)).fetchone()
         if res is None:
             c.execute('INSERT INTO bad_songs (name, song, num) VALUES (?, ?, ?)', (name, song, 1))
