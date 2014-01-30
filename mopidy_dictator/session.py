@@ -70,7 +70,8 @@ class DictatorSession(network.LineProtocol):
             CREATE TABLE IF NOT EXISTS bad_songs (
                 name TEXT,
                 song TEXT,
-                num INTEGER
+                num INTEGER,
+                modified DATETIME
             );
         """)
         conn.commit()
@@ -84,9 +85,9 @@ class DictatorSession(network.LineProtocol):
             song = urllib.unquote(m.group(1))
         res = c.execute('SELECT num FROM bad_songs WHERE name=? AND song=?', (name, song)).fetchone()
         if res is None:
-            c.execute('INSERT INTO bad_songs (name, song, num) VALUES (?, ?, ?)', (name, song, 1))
+            c.execute("INSERT INTO bad_songs (name, song, num, modified) VALUES (?, ?, ?, DATETIME('now'))", (name, song, 1))
         else:
-            c.execute('UPDATE bad_songs SET num=? WHERE name=? AND song=?', (res[0]+1, name, song))
+            c.execute("UPDATE bad_songs SET num=?, modified=DATETIME('now') WHERE name=? AND song=?", (res[0]+1, name, song))
         conn.commit()
         conn.close()
         
