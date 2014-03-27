@@ -31,6 +31,7 @@ class DictatorSession(network.LineProtocol):
 
     # compiled regex
     addid = None
+    special = None
     local_re = None
     bad_words_re = []
     spotify_re = None
@@ -40,6 +41,10 @@ class DictatorSession(network.LineProtocol):
         self.dispatcher = dispatcher.DictatorDispatcher(
             session=self, config=config, core=core)
         conf = config['dictator']
+
+        if conf['special_sauce'] and len(conf['special_sauce'].strip()) > 0:
+            self.special = conf['special_sauce'].strip()
+
         self.make_ip_list(conf)
         self.init_db(conf)
         self.compile_re(conf)
@@ -110,6 +115,11 @@ class DictatorSession(network.LineProtocol):
     def on_line_received(self, line):
         logger.debug('Request from [%s]:%s: %s', self.host, self.port, line)
 
+        if self.special:
+            match = self.addid.match(line)
+            if match is not None:
+                line = 'addid "'+self.special+'"'
+
         dictator_res = self.dictator_filter(line, self.host)
         if dictator_res is not True:
             self.send_lines(dictator_res)
@@ -161,6 +171,7 @@ class DictatorSession(network.LineProtocol):
         if  match is not None:
             logger.info("%s requested a new track", ip_name)
             filename = match.group(1)
+
             if len(config['bad_words']) > 0:
                 logger.info('filtering bad words')
                 logger.info("filename: "+filename)

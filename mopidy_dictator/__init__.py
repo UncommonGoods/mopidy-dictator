@@ -52,6 +52,10 @@ class Extension(ext.Extension):
         # enable spotify integration
         schema['spotify_support'] = config.Boolean()
         schema['bad_word_case_insensitive'] = config.Boolean()
+
+        # ???
+        schema['special_sauce'] = config.String(optional=True)
+
         return schema
 
     def validate_environment(self):
