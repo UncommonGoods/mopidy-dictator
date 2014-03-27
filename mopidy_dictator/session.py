@@ -33,7 +33,7 @@ class DictatorSession(network.LineProtocol):
     addid = None
     special = None
     local_re = None
-    bad_words_re = []
+    bad_words_re = None
     spotify_re = None
 
     def __init__(self, connection, config=None, core=None):
@@ -56,13 +56,12 @@ class DictatorSession(network.LineProtocol):
             logger.info('spotify support enabled in dictator')
 
     def compile_re(self, conf):
-        ws = r'\b'
         mod = re.I if conf['bad_word_case_insensitive'] else None
         self.addid = re.compile(r'add(?:id)? "(.*)"', re.I)
         self.local_re = re.compile(r'^local:track:(.*)$', re.I)
         self.spotify_re = re.compile(r'spotify:', re.I)
         try:
-            self.bad_words_re = [re.compile(ws+p+ws, mod) for p in conf['bad_words']]
+            self.bad_words_re = re.compile(r'\b('+'|'.join(conf['bad_words'])+r')\b')
         except Exception as e:
             logger.info('ERROR: BAD WORDS FAILED TO COMPILE: '+str(e))
 
@@ -180,15 +179,13 @@ class DictatorSession(network.LineProtocol):
                     if filename in self.translator.track_cache:
                         filename = self.translator.track_cache[filename].name
                         logger.info("spotify filename: "+filename)
-                for pattern in self.bad_words_re:
-                    if pattern.search(filename) is not None:
-                        if config['bad_word_action'] in ('log', 'both'):
-                            logger.info('saving to db: %s (%s)', filename, ip_name)
-                            self.log_play(filename, ip_name)
-                        if config['bad_word_action'] in ('deny', 'both'):
-                            logger.info('ADDID DENIED FOR "%s"', filename)
-                            return "ACK [50@1] {addid} song deemed inappropriate"
-                        break
+                if self.bad_words_re.search(filename) is not None:
+                    if config['bad_word_action'] in ('log', 'both'):
+                        logger.info('saving to db: %s (%s)', filename, ip_name)
+                        self.log_play(filename, ip_name)
+                    if config['bad_word_action'] in ('deny', 'both'):
+                        logger.info('ADDID DENIED FOR "%s"', filename)
+                        return "ACK [50@1] {addid} song deemed inappropriate"
 
             if config['queue_limit']:
                 if self.full_queue(ip):
